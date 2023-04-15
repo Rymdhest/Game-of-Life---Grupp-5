@@ -26,16 +26,32 @@ namespace Game_of_Life
             }
         }
         /*Den här funktionen går igenom varje möjlig poisition i tabellen och tilldelar den strängen "□ " som sedan skrivs ut,
-         * för den automatiska körläget behöver vi nog ändra det så att strängen som tilldelas är randomiserad och väljer mellan 
-         * "□ " och "■ ".*/
+         * för den automatiska körläget behöver vi nog ändra det så att strängen som tilldelas är randomiserad värde 
+         * och väljer mellan "□ " och "■ ".*/
 
-            static void Main(string[] args)
+        static void Main(string[] args)
         {
-                Console.OutputEncoding = System.Text.Encoding.UTF8;
-                // Console.WriteLine("□ ■");
-                string[,] table = initializeTable();
-                PrintTable(table);
+
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.WriteLine("Game of Life");
+            string command;
+            do
+            {
+                Console.Write($"> ");
+                command = Console.ReadLine();
+
+                if (command == "run")
+                {
+                    Console.Clear();
+                    string[,] table = initializeTable();
+                    PrintTable(table);
+                }
+                else if (command == "something")
+                {
+                }
             }
+             while (command != "quit");
+        }
     }
 
 }
