@@ -25,9 +25,10 @@ namespace Game_of_Life
                 Console.WriteLine();
             }
         }
-        /*Den här funktionen går igenom varje möjlig poisition i tabellen och tilldelar den strängen "□ " som sedan skrivs ut,
+        /*Den här funktionen går igenom varje möjlig position i tabellen och tilldelar den strängen "□ " som sedan skrivs ut,
          * för den automatiska körläget behöver vi nog ändra det så att strängen som tilldelas är randomiserad värde 
-         * och väljer mellan "□ " och "■ ".*/
+         * och väljer mellan "□ " och "■ ". För den manuella behöver vi en funktion där användaren uppger vilka positioner
+         * som blir "■ "*/
 
         static void Main(string[] args)
         {
