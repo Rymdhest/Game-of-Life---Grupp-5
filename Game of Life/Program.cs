@@ -39,14 +39,20 @@ namespace Game_of_Life
             {
                 Console.Write($"> ");
                 command = Console.ReadLine();
+                //TODO: Add printHelp function with commands
 
                 if (command == "run")
                 {
-                    Console.Clear();
+                    //TODO: Function needs to be split into two, one for automatic and one for manual
+
+                    Console.Clear();/*Console.Clear rensar displayen innan den printar tabellen. Den blir även
+                                     * användbar när vi ska "stega" genom cellgenerationerna så att den inte printar under men
+                                     * ovanpå den tidigare generationen (tror jag)*/
+
                     string[,] table = initializeTable();
                     PrintTable(table);
                 }
-                else if (command == "something")
+                else if (command == "something")//NYI
                 {
                 }
             }
