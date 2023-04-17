@@ -142,6 +142,7 @@ namespace Game_of_Life
         }
         public void PrintMenu()
         {
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.Clear();
             Console.CursorVisible = false;
             string emptySpace = "";
@@ -161,6 +162,7 @@ namespace Game_of_Life
                     Console.WriteLine(emptySpace + Options[i]);
                 }
             }
+            Console.ResetColor();
         }
         private void IncrementSelectedOption()
         {
