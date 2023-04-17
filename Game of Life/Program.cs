@@ -188,7 +188,8 @@ namespace Game_of_Life
                     }
                     else if (KeyInfo.Key.ToString() == "Escape")
                     {
-                        return;
+                        CurrentState = MenuState;
+                        menu.PrintMenu();
                     }
                 } 
             }
@@ -203,7 +204,7 @@ namespace Game_of_Life
         public Menu()
         {
             SelectedOption = 0;
-            Options = new string[]{"Play New Game","Load Game", "Quit"};
+            Options = new string[]{"New Game","Load Game", "Quit"};
         }
         public void PrintMenu()
         {
