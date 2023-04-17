@@ -74,6 +74,7 @@ namespace Game_of_Life
         public void PrintMenu()
         {
             Console.Clear();
+            Console.CursorVisible = false;
             string emptySpace = "";
             for (int i = 0; i < selectedPrefixMarker.Length; i++)
             {
@@ -111,6 +112,7 @@ namespace Game_of_Life
             if (KeyInfo.Key.ToString() == "UpArrow") DecrementSelectedOption();
             if (KeyInfo.Key.ToString() == "DownArrow") IncrementSelectedOption();
             if (KeyInfo.Key.ToString() == "Enter") ApplySelectedOption();
+
         }
         private void ApplySelectedOption()
         {
