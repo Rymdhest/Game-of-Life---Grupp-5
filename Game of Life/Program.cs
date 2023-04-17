@@ -69,6 +69,10 @@ namespace Game_of_Life
                     }
                     Console.WriteLine();
                 }
+                Console.WriteLine("\n\n" +
+                    "Controls: \n" +
+                    "Spacebar - Runs the simulation one step\n" +
+                    "Escape - Terminates the application");
             }
         }
         //Den här funktionen går igenom varje möjlig position i tabellen och tilldelar den strängen "□ " som sedan skrivs ut.
@@ -174,8 +178,19 @@ namespace Game_of_Life
                 } else if (CurrentState == GameState)
                 {
                     Console.Clear();
-                    gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
-                }
+                    gameField.PrintTable();
+                    ConsoleKeyInfo KeyInfo = Console.ReadKey();
+                    if (KeyInfo.Key.ToString() == "Spacebar")
+                    {
+                        Console.Clear();
+                        gameField.Step();
+                        gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
+                    }
+                    else if (KeyInfo.Key.ToString() == "Escape")
+                    {
+                        return;
+                    }
+                } 
             }
         }
     }
