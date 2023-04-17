@@ -114,7 +114,7 @@ namespace Game_of_Life
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Menu menu= new Menu();
             menu.PrintMenu();
-            string[,] GameField = initializeTable();
+            string[,] GameField = randomizeTable();
             while (CurrentState != QuitState)
             {
                 if (CurrentState == MenuState)
