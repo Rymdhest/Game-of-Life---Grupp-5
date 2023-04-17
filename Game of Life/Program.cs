@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
 
 namespace Game_of_Life
@@ -16,16 +17,69 @@ namespace Game_of_Life
         /*TODO: Vi kommer förmodligen behöva två dubbelarrayer. En "gammal" och en "ny" så att den nya arrayen tar emot de nya värden utan att ändra värden
          * på den gamla (om den ändra värden på grannceller under tiden som den loopar igenom så kommer inte spelet antagligen fungera som den ska). 
          * När den har loopat klar igenom array borde värden i nya arrayen överföras till gamla osv.*/
-        public static string[,] initializeTable()
+        public static string[,] initializeTable(int height, int width)
         {
-            string[,] table = new string[25, 40];
+            string[,] table = new string[height, width];
             return table;
         }
+        public class gameBoard
+        {
+            private int height, width;
+            private bool[,] activeTable;
+            private bool[,] inactiveTable;
 
+            public gameBoard(int height, int width, bool randomize = false)
+            {
+                this.height = height;
+                this.width = width;
+                activeTable = new bool[height, width];
+                inactiveTable = new bool[height, width];
+                if(randomize) this.Randomize(height, width);        
+            }
+            public void Step()
+            {
+                for (int i = 0; i < height; i++)
+                    for (int j = 0; j < width; j++)
+                        inactiveTable[i, j] = SquareStep(i, j);
+                activeTable = inactiveTable;
+                inactiveTable = new bool[height, width];
+            }
+            private bool SquareStep(int i, int j)
+            {
+                //NYI: Check status for activeBoard[i,j] for dead or alive. Check status of neighbours. Return dead (false) or alive (true) according to ruleset.
+                return !activeTable[i, j]; //DEBUG: Placeholder method to make sure each square changes status each step to test Step() functionality.
+            }
+            public void Randomize(int height, int width)
+            {
+                Random rand = new Random();
+                    for(int i = 0; i < height; i++)
+                    {
+                        for(int j = 0; j < width; j++)
+                            activeTable[i,j] = rand.NextDouble() > 0.5;
+                    }
+            }
+            public void PrintTable()
+            {
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        if (activeTable[i, j]) Console.Write("■ ");
+                        else Console.Write("□ ");
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine("\n\n" +
+                    "Controls: \n" +
+                    "Spacebar - Runs the simulation one step\n" +
+                    "Escape - Terminates the application");
+            }
+        }
         //Den här funktionen går igenom varje möjlig position i tabellen och tilldelar den strängen "□ " som sedan skrivs ut.
         /*TODO: för den automatiska körläget behöver vi nog ändra det så att strängen som tilldelas är randomiserad värde 
          * och väljer mellan "□ " och "■ ". För den manuella behöver vi en funktion där användaren uppger vilka positioner
          * som blir "■ "*/
+        
         public static void PrintTable(string[,] table)
         {
             for (int i = 0; i < table.GetLength(0); i++)
@@ -114,7 +168,7 @@ namespace Game_of_Life
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Menu menu= new Menu();
             menu.PrintMenu();
-            string[,] GameField = randomizeTable();
+            gameBoard gameField = new gameBoard(25, 40);
             while (CurrentState != QuitState)
             {
                 if (CurrentState == MenuState)
@@ -124,8 +178,19 @@ namespace Game_of_Life
                 } else if (CurrentState == GameState)
                 {
                     Console.Clear();
-                    PrintTable(GameField); //TODO implementera spelet på riktigt. bara fulkod här
-                }
+                    gameField.PrintTable();
+                    ConsoleKeyInfo KeyInfo = Console.ReadKey();
+                    if (KeyInfo.Key.ToString() == "Spacebar")
+                    {
+                        Console.Clear();
+                        gameField.Step();
+                        gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
+                    }
+                    else if (KeyInfo.Key.ToString() == "Escape")
+                    {
+                        return;
+                    }
+                } 
             }
         }
     }
