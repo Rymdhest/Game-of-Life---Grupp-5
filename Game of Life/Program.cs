@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.IO;
+using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
 
 namespace Game_of_Life
@@ -9,6 +11,7 @@ namespace Game_of_Life
         public const int MenuState = 0;
         public const int GameState = 1;
         public const int QuitState = 2;
+        public static gameBoard gameField = new gameBoard(25, 40);
 
         /*Den här funktionen initierar en dubbel array. Dubbla arrayer är som 2D tabeller, första värden
         * är antal rader, andra värden är antal kolumner. Position i tabell kan man komma åt genom att ange rad och kolumn
@@ -16,16 +19,107 @@ namespace Game_of_Life
         /*TODO: Vi kommer förmodligen behöva två dubbelarrayer. En "gammal" och en "ny" så att den nya arrayen tar emot de nya värden utan att ändra värden
          * på den gamla (om den ändra värden på grannceller under tiden som den loopar igenom så kommer inte spelet antagligen fungera som den ska). 
          * När den har loopat klar igenom array borde värden i nya arrayen överföras till gamla osv.*/
-        public static string[,] initializeTable()
+        public static string[,] initializeTable(int height, int width)
         {
-            string[,] table = new string[25, 40];
+            string[,] table = new string[height, width];
             return table;
+
+        }
+        public static gameBoard LoadGameFromFile(string filePath)
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            int height = lines.Length;
+            int width = lines[0].Length;
+
+            gameBoard loadedGame = new gameBoard(height, width);
+
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    if (lines[i][j] == '■')
+                    {
+                        loadedGame.SetActiveTableValue(i, j, true);
+                    }
+                    else
+                    {
+                        loadedGame.SetActiveTableValue(i, j, false);
+                    }
+
+                }
+            }
+
+            return loadedGame;
         }
 
+        public class gameBoard
+        {
+            public void SetActiveTableValue(int i, int j, bool value)
+            {
+                activeTable[i, j] = value;
+            }
+
+            public bool GetActiveTableValue(int i, int j)
+            {
+                return activeTable[i, j];
+            }
+
+            private int height, width;
+            private bool[,] activeTable;
+            private bool[,] inactiveTable;
+
+            public gameBoard(int height, int width, bool randomize = false)
+            {
+                this.height = height;
+                this.width = width;
+                activeTable = new bool[height, width];
+                inactiveTable = new bool[height, width];
+                if (randomize) this.Randomize(height, width);
+            }
+            public void Step()
+            {
+                for (int i = 0; i < height; i++)
+                    for (int j = 0; j < width; j++)
+                        inactiveTable[i, j] = SquareStep(i, j);
+                activeTable = inactiveTable;
+                inactiveTable = new bool[height, width];
+            }
+            private bool SquareStep(int i, int j)
+            {
+                //NYI: Check status for activeBoard[i,j] for dead or alive. Check status of neighbours. Return dead (false) or alive (true) according to ruleset.
+                return !activeTable[i, j]; //DEBUG: Placeholder method to make sure each square changes status each step to test Step() functionality.
+            }
+            public void Randomize(int height, int width)
+            {
+                Random rand = new Random();
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                        activeTable[i, j] = rand.NextDouble() > 0.5;
+                }
+            }
+            public void PrintTable()
+            {
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        if (activeTable[i, j]) Console.Write("■ ");
+                        else Console.Write("□ ");
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine("\n\n" +
+                    "Controls: \n" +
+                    "Spacebar - Runs the simulation one step\n" +
+                    "Escape - Terminates the application");
+            }
+        }
         //Den här funktionen går igenom varje möjlig position i tabellen och tilldelar den strängen "□ " som sedan skrivs ut.
         /*TODO: för den automatiska körläget behöver vi nog ändra det så att strängen som tilldelas är randomiserad värde 
          * och väljer mellan "□ " och "■ ". För den manuella behöver vi en funktion där användaren uppger vilka positioner
          * som blir "■ "*/
+
         public static void PrintTable(string[,] table)
         {
             for (int i = 0; i < table.GetLength(0); i++)
@@ -112,19 +206,32 @@ namespace Game_of_Life
         {
             CurrentState = MenuState;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Menu menu= new Menu();
+            Menu menu = new Menu();
             menu.PrintMenu();
-            string[,] GameField = initializeTable();
+            gameBoard gameField = new gameBoard(25, 40);
             while (CurrentState != QuitState)
             {
                 if (CurrentState == MenuState)
                 {
                     menu.checkInput();
                     menu.PrintMenu();
-                } else if (CurrentState == GameState)
+                }
+                else if (CurrentState == GameState)
                 {
                     Console.Clear();
-                    PrintTable(GameField); //TODO implementera spelet på riktigt. bara fulkod här
+                    gameField.PrintTable();
+                    ConsoleKeyInfo KeyInfo = Console.ReadKey();
+                    if (KeyInfo.Key.ToString() == "Spacebar")
+                    {
+                        Console.Clear();
+                        gameField.Step();
+                        gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
+                    }
+                    else if (KeyInfo.Key.ToString() == "Escape")
+                    {
+                        CurrentState = MenuState;
+                        menu.PrintMenu();
+                    }
                 }
             }
         }
@@ -138,34 +245,39 @@ namespace Game_of_Life
         public Menu()
         {
             SelectedOption = 0;
-            Options = new string[]{"Play New Game","Load Game", "Quit"};
+            Options = new string[] { "New Game", "Load Game", "Quit" };
         }
         public void PrintMenu()
         {
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.Clear();
+            Console.CursorVisible = false;
             string emptySpace = "";
             for (int i = 0; i < selectedPrefixMarker.Length; i++)
             {
                 emptySpace += " ";
             }
 
-            for (int i = 0; i<Options.Length; i++)
+            for (int i = 0; i < Options.Length; i++)
             {
-                if (i==SelectedOption)
+                if (i == SelectedOption)
                 {
                     Console.WriteLine(selectedPrefixMarker + Options[i]);
-                } else
+                }
+                else
                 {
 
                     Console.WriteLine(emptySpace + Options[i]);
                 }
             }
+            Console.ResetColor();
         }
         private void IncrementSelectedOption()
         {
-            if (SelectedOption < Options.Length-1) {
+            if (SelectedOption < Options.Length - 1)
+            {
                 SelectedOption++;
-            }    
+            }
         }
         private void DecrementSelectedOption()
         {
@@ -180,8 +292,9 @@ namespace Game_of_Life
             if (KeyInfo.Key.ToString() == "UpArrow") DecrementSelectedOption();
             if (KeyInfo.Key.ToString() == "DownArrow") IncrementSelectedOption();
             if (KeyInfo.Key.ToString() == "Enter") ApplySelectedOption();
+
         }
-        private void ApplySelectedOption()
+        public void ApplySelectedOption()
         {
             if (SelectedOption == 0)
             {
@@ -189,7 +302,10 @@ namespace Game_of_Life
             }
             if (SelectedOption == 1)
             {
-                //TODO lägg till ladda nytt spel från fil
+                // ladda nytt spel från fil
+                string filePath = "C: \\Users\\A.T\\Desktop\\Mölk\\AGIL\\Projekt\Game - of - Life-- - Grupp - 5\\gameoflife.txt";
+                Program.gameField = Program.LoadGameFromFile(filePath);
+                Program.CurrentState = Program.GameState;
             }
             if (SelectedOption == 2)
             {
