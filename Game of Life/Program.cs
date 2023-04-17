@@ -1,8 +1,14 @@
 ﻿
+using System.Runtime.ConstrainedExecution;
+
 namespace Game_of_Life
 {
     internal class Program
     {
+        public static int CurrentState;
+        public const int MenuState = 0;
+        public const int GameState = 1;
+        public const int QuitState = 2;
 
         /*Den här funktionen initierar en dubbel array. Dubbla arrayer är som 2D tabeller, första värden
         * är antal rader, andra värden är antal kolumner. Position i tabell kan man komma åt genom att ange rad och kolumn
@@ -35,33 +41,84 @@ namespace Game_of_Life
 
         static void Main(string[] args)
         {
-
+            CurrentState = MenuState;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine("Game of Life");
-            string command;
-            do
+            Menu menu= new Menu();
+            menu.PrintMenu();
+            string[,] GameField = initializeTable();
+            while (CurrentState != QuitState)
             {
-                Console.Write($"> ");
-                command = Console.ReadLine();
-                //TODO: Add printHelp function with commands
-
-                if (command == "run")
+                if (CurrentState == MenuState)
                 {
-                    //TODO: Function needs to be split into two, one for automatic and one for manual
-
-                    Console.Clear();/*Console.Clear rensar displayen innan den printar tabellen. Den blir även
-                                     * användbar när vi ska "stega" genom cellgenerationerna så att den inte printar under men
-                                     * ovanpå den tidigare generationen (tror jag)*/
-
-                    string[,] table = initializeTable();
-                    PrintTable(table);
-                }
-                else if (command == "something")//NYI
+                    menu.checkInput();
+                    menu.PrintMenu();
+                } else if (CurrentState == GameState)
                 {
+                    Console.Clear();
+                    PrintTable(GameField); //TODO implementera spelet på riktigt. bara fulkod här
                 }
             }
-             while (command != "quit");
         }
     }
+    public class Menu
+    {
+        private string[] Options;
+        private int SelectedOption;
+        private string selectedPrefixMarker = "-> ";
 
+        public Menu()
+        {
+            SelectedOption = 0;
+            Options = new string[]{"Play New Game","Load Game", "Quit"};
+        }
+        public void PrintMenu()
+        {
+            Console.Clear();
+            for (int i = 0; i<Options.Length; i++)
+            {
+                if (i==SelectedOption)
+                {
+                    Console.WriteLine(selectedPrefixMarker + Options[i]);
+                } else
+                {
+                    Console.WriteLine("   "+Options[i]);
+                }
+            }
+        }
+        private void IncrementSelectedOption()
+        {
+            if (SelectedOption < Options.Length-1) {
+                SelectedOption++;
+            }    
+        }
+        private void DecrementSelectedOption()
+        {
+            if (SelectedOption > 0)
+            {
+                SelectedOption--;
+            }
+        }
+        public void checkInput()
+        {
+            ConsoleKeyInfo KeyInfo = Console.ReadKey();
+            if (KeyInfo.Key.ToString() == "UpArrow") DecrementSelectedOption();
+            if (KeyInfo.Key.ToString() == "DownArrow") IncrementSelectedOption();
+            if (KeyInfo.Key.ToString() == "Enter") ApplySelectedOption();
+        }
+        private void ApplySelectedOption()
+        {
+            if (SelectedOption == 0)
+            {
+                Program.CurrentState = Program.GameState;
+            }
+            if (SelectedOption == 1)
+            {
+                //TODO lägg till ladda nytt spel från fil
+            }
+            if (SelectedOption == 2)
+            {
+                Program.CurrentState = Program.QuitState;
+            }
+        }
+    }
 }
