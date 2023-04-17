@@ -74,6 +74,12 @@ namespace Game_of_Life
         public void PrintMenu()
         {
             Console.Clear();
+            string emptySpace = "";
+            for (int i = 0; i < selectedPrefixMarker.Length; i++)
+            {
+                emptySpace += " ";
+            }
+
             for (int i = 0; i<Options.Length; i++)
             {
                 if (i==SelectedOption)
@@ -81,7 +87,8 @@ namespace Game_of_Life
                     Console.WriteLine(selectedPrefixMarker + Options[i]);
                 } else
                 {
-                    Console.WriteLine("   "+Options[i]);
+
+                    Console.WriteLine(emptySpace + Options[i]);
                 }
             }
         }
