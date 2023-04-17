@@ -32,10 +32,79 @@ namespace Game_of_Life
             {
                 for (int j = 0; j < table.GetLength(1); j++)
                 {
-                    Console.Write("□ ");
+                    Console.Write(table[i, j] + " ");
                 }
                 Console.WriteLine();
             }
+        }
+        public static string[,] randomizeTable()
+        {
+            string[,] table = new string[25, 40];
+            Random random = new Random();
+
+            for (int i = 0; i < table.GetLength(0); i++)
+            {
+                for (int j = 0; j < table.GetLength(1); j++)
+                {
+                    int randomNum = random.Next(2); // Skapar random siffra mellan 0 och 1
+                    if (randomNum == 0)
+                    {
+                        table[i, j] = "□";
+                    }
+                    else
+                    {
+                        table[i, j] = "■";
+                    }
+                }
+            }
+
+            return table;
+        }
+        public static void calculateGeneration(string[,] table)
+        {
+            int rows = table.GetLength(0);
+            int columns = table.GetLength(1);
+            string[,] newGen = new string[rows, columns];//Skapa array för att tilldela de nya värden
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    int livecount = 0;
+                    int deadcount = 0;
+                    for (int x = i - 1; x <= i + 1; x++)
+                    {
+                        for (int y = j - 1; y <= j + 1; y++)
+                        {
+
+                            if (x < 0 || y < 0 || x >= rows || y >= columns || (x == i && y == j)) //denna rad skippar räkna med cellen man står på och cellerna utanför rutnätet
+                            {
+                                continue;
+                            }
+                            if (table[x, y] == "■")
+                            {
+                                livecount++;
+                            }
+                            else if (table[x, y] == "□")
+                            {
+                                deadcount++;
+                            }
+                        }
+                    }
+                    if (table[i, j] == "□" && livecount >= 3) //Döda celler med 3 eller fler grannar återupplivas
+                    {
+                        newGen[i, j] = "■";
+                    }
+                    else if (table[i, j] == "■" && (livecount == 2 || livecount == 3)) //Levande celler med 2 eller 3 grannar lever vidare
+                    {
+                        newGen[i, j] = "■";
+                    }
+                    else
+                    {
+                        newGen[i, j] = "□"; //Celler med none of the above fortsätter vara döda
+                    }
+                }
+            }
+            Array.Copy(newGen, table, newGen.Length);//Copierar nya arrayen till gamla när allt är klarräknad
         }
 
 
