@@ -17,7 +17,7 @@ namespace Game_of_Life
         public static gameBoard gameField;
         public static Coordinate cursor = new();
         public static int cursor_x = 0, cursor_y = 0;
-        public static int DEFAULT_WIDTH = 40, DEFAULT_HEIGHT = 24;
+        public static int DEFAULT_WIDTH = 40, DEFAULT_HEIGHT = 19;
 
         public class Coordinate
         {
