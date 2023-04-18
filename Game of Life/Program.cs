@@ -304,7 +304,7 @@ namespace Game_of_Life
             if (SelectedOption == 1)
             {
                 // ladda nytt spel från fil
-                string filePath = Directory.GetCurrentDirectory() + "\\gameoflife.txt";
+                string filePath = Path.GetFullPath("..\\..\\..\\gameoflife.txt");
                 Program.gameField = Program.LoadGameFromFile(filePath);
                 Program.CurrentState = Program.GameState;
             }
