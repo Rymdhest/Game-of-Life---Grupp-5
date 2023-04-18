@@ -58,8 +58,9 @@ namespace Game_of_Life
             private bool[,] activeTable;
             private bool[,] inactiveTable;
 
-            public gameBoard(int height, int width, bool randomize = false)
+            public gameBoard(int height, int width, bool randomize = false) 
             {
+                //FIXME storleken på spelplanen får inte vara större än konsollrutan. då fungerar inte Console.clear() som vi vill.
                 this.height = height;
                 this.width = width;
                 activeTable = new bool[height, width];
