@@ -186,11 +186,13 @@ namespace Game_of_Life
                         gameField.Step();
                         gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
                     }
+                    
                     else if (KeyInfo.Key.ToString() == "Escape")
                     {
                         CurrentState = MenuState;
                         menu.PrintMenu();
                     }
+                    
                 } 
             }
         }
@@ -199,7 +201,7 @@ namespace Game_of_Life
     {
         private string[] Options;
         private int SelectedOption;
-        private string selectedPrefixMarker = "-> ";
+        private readonly string selectedPrefixMarker = "-> ";
 
         public Menu()
         {
