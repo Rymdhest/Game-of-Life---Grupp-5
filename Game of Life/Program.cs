@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
 using System.Diagnostics;
+using static Game_of_Life.Program;
 
 namespace Game_of_Life
 {
@@ -12,7 +13,7 @@ namespace Game_of_Life
         public const int MenuState = 0;
         public const int GameState = 1;
         public const int QuitState = 2;
-        public static gameBoard gameField = new gameBoard(25, 40);
+        public static gameBoard gameField;
 
         public static gameBoard LoadGameFromFile(string filePath)
         {
@@ -38,7 +39,6 @@ namespace Game_of_Life
 
                 }
             }
-            loadedGame = new gameBoard(height, width, true);
             return loadedGame;
         }
 
@@ -68,7 +68,6 @@ namespace Game_of_Life
             }
             public void Step()
             {
-                Debug.WriteLine(width + " - " + height);
                 for (int i = 0; i < height; i++)
                     for (int j = 0; j < width; j++)
                         inactiveTable[i, j] = SquareStep(i, j);
@@ -99,17 +98,16 @@ namespace Game_of_Life
                         if (activeTable[i, j]) Console.Write("■ ");
                         else Console.Write("□ ");
                     }
-                    if (i != height-1)//WTF??? varje gång spelplanen printas ut så växer den med en rad i konsollen och blir längre och längre över tid
-                        //Denna if-sats fixar problemet men ingen aning varför......................................
-                    {
-                        Console.Write("\n");
-                    }
                     
+
+                    Console.WriteLine();
                 }
+                
                 Console.WriteLine("\n\n" +
                     "Controls: \n" +
                     "Spacebar - Runs the simulation one step\n" +
                     "Escape - Terminates the application");
+                
             }
         }
         public static void calculateGeneration(string[,] table)
@@ -257,11 +255,12 @@ namespace Game_of_Life
             if (SelectedOption == 0)
             {
                 Program.CurrentState = Program.GameState;
+                gameField = new gameBoard(24, 40);
             }
             if (SelectedOption == 1)
             {
                 // ladda nytt spel från fil
-                string filePath = Path.GetFullPath("..\\..\\..\\gameoflife.txt");
+                string filePath = Path.GetFullPath("..\\..\\..\\gameoflife2.txt");
                 Program.gameField = Program.LoadGameFromFile(filePath);
                 Program.CurrentState = Program.GameState;
             }
