@@ -15,6 +15,7 @@ namespace Game_of_Life
         public const int GameState = 1;
         public const int QuitState = 2;
         public static gameBoard gameField;
+        public static int cursor_x = 0, cursor_y = 0;
 
         public static gameBoard LoadGameFromFile(string filePath)
         {
@@ -55,7 +56,8 @@ namespace Game_of_Life
                 return activeTable[i, j];
             }
 
-            private int height, width;
+            public int height { get; private set; }
+            public int width { get; private set; }
             private bool[,] activeTable;
             private bool[,] inactiveTable;
 
@@ -91,19 +93,23 @@ namespace Game_of_Life
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (activeTable[i, j]) output += "■ ";
-                        else output += "□ ";
+                        if (activeTable[i, j]) output += "■";
+                        else output += "□";
+                        if (i == cursor_y && j == cursor_x) output += "<";
+                        else output += " ";
                     }
 
 
                     output += "\n";
                 }
 
-                output +="\n\n" +
+                output += "\n\n" +
                     "Controls: \n" +
                     "spacebar - Runs the simulation one step\n" +
                     "a        - Runs the simulation until cancelled with spacebar\n" +
-                    "escape   - Return to menu";
+                    "← → ↑ ↓  - Move marker\n" +
+                    "s        - Toggle dead/alive for selected square\n" +
+                    "escape   - Return to menu\n";
                 Console.WriteLine(output);
             }
             public void calculateGeneration()
@@ -166,11 +172,34 @@ namespace Game_of_Life
                         gameField.Step();
                         gameField.PrintTable();
                     }
-                    
                     else if (KeyInfo.Key.ToString() == "Escape")
                     {
                         CurrentState = MenuState;
                         menu.PrintMenu();
+                    }
+                    else if (KeyInfo.Key.ToString() == "RightArrow" && cursor_x < gameField.width - 1)
+                    {
+                        cursor_x++;
+                        gameField.PrintTable();
+                    }
+                    else if (KeyInfo.Key.ToString() == "LeftArrow" && cursor_x > 0)
+                    {
+                        cursor_x--;
+                        gameField.PrintTable();
+                    }
+                    else if (KeyInfo.Key.ToString() == "DownArrow" && cursor_y < gameField.height - 1)
+                    {
+                        cursor_y++;
+                        gameField.PrintTable();
+                    }
+                    else if (KeyInfo.Key.ToString() == "UpArrow" && cursor_y > 0)
+                    {
+                        cursor_y--;
+                        gameField.PrintTable();
+                    }
+                    else if (KeyInfo.Key.ToString().ToLower() == "s")
+                    {
+                        gameField.SetActiveTableValue(cursor_y, cursor_x, !gameField.GetActiveTableValue(cursor_y, cursor_x));
                     }
                     else if(KeyInfo.Key.ToString().ToLower() == "a")
                     {
