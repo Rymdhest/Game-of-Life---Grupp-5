@@ -92,23 +92,24 @@ namespace Game_of_Life
             public void PrintTable() 
             {
                 Console.Clear();
+                string output = "";
                 for (int i = 0; i < height; i++)
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (activeTable[i, j]) Console.Write("■ ");
-                        else Console.Write("□ ");
+                        if (activeTable[i, j]) output += "■ ";
+                        else output += "□ ";
                     }
-                    
 
-                    Console.WriteLine();
+
+                    output += "\n";
                 }
-                
-                Console.WriteLine("\n\n" +
+
+                output +="\n\n" +
                     "Controls: \n" +
                     "Spacebar - Runs the simulation one step\n" +
-                    "Escape - Terminates the application");
-                
+                    "Escape - Terminates the application";
+                Console.WriteLine(output);
             }
         }
         public static void calculateGeneration(string[,] table)
