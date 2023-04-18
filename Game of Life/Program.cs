@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
 using System.Diagnostics;
 using static Game_of_Life.Program;
+using System.Timers;
 
 namespace Game_of_Life
 {
@@ -69,16 +70,9 @@ namespace Game_of_Life
             }
             public void Step()
             {
-                for (int i = 0; i < height; i++)
-                    for (int j = 0; j < width; j++)
-                        inactiveTable[i, j] = SquareStep(i, j);
+                calculateGeneration();
                 activeTable = inactiveTable;
                 inactiveTable = new bool[height, width];
-            }
-            private bool SquareStep(int i, int j)
-            {
-                //NYI: Check status for activeBoard[i,j] for dead or alive. Check status of neighbours. Return dead (false) or alive (true) according to ruleset.
-                return !activeTable[i, j]; //DEBUG: Placeholder method to make sure each square changes status each step to test Step() functionality.
             }
             public void Randomize(int height, int width)
             {
@@ -107,59 +101,48 @@ namespace Game_of_Life
 
                 output +="\n\n" +
                     "Controls: \n" +
-                    "Spacebar - Runs the simulation one step\n" +
-                    "Escape - Terminates the application";
+                    "spacebar - Runs the simulation one step\n" +
+                    "a        - Runs the simulation until cancelled with spacebar\n" +
+                    "escape   - Return to menu";
                 Console.WriteLine(output);
             }
-        }
-        public static void calculateGeneration(string[,] table)
-        {
-            int rows = table.GetLength(0);
-            int columns = table.GetLength(1);
-            string[,] newGen = new string[rows, columns];//Skapa array för att tilldela de nya värden
-            for (int i = 0; i < rows; i++)
+            public void calculateGeneration()
             {
-                for (int j = 0; j < columns; j++)
+                for (int i = 0; i < height; i++)
                 {
-                    int livecount = 0;
-                    int deadcount = 0;
-                    for (int x = i - 1; x <= i + 1; x++)
+                    for (int j = 0; j < width; j++)
                     {
-                        for (int y = j - 1; y <= j + 1; y++)
+                        int livecount = 0;
+                        for (int x = i - 1; x <= i + 1; x++)
                         {
-
-                            if (x < 0 || y < 0 || x >= rows || y >= columns || (x == i && y == j)) //denna rad skippar räkna med cellen man står på och cellerna utanför rutnätet
+                            for (int y = j - 1; y <= j + 1; y++)
                             {
-                                continue;
-                            }
-                            if (table[x, y] == "■")
-                            {
-                                livecount++;
-                            }
-                            else if (table[x, y] == "□")
-                            {
-                                deadcount++;
+                                if (x < 0 || y < 0 || x >= height || y >= width || (x == i && y == j)) //denna rad skippar räkna med cellen man står på och cellerna utanför rutnätet
+                                {
+                                    continue;
+                                }
+                                if (activeTable[x, y] == true)
+                                {
+                                    livecount++;
+                                }
                             }
                         }
-                    }
-                    if (table[i, j] == "□" && livecount >= 3) //Döda celler med 3 eller fler grannar återupplivas
-                    {
-                        newGen[i, j] = "■";
-                    }
-                    else if (table[i, j] == "■" && (livecount == 2 || livecount == 3)) //Levande celler med 2 eller 3 grannar lever vidare
-                    {
-                        newGen[i, j] = "■";
-                    }
-                    else
-                    {
-                        newGen[i, j] = "□"; //Celler med none of the above fortsätter vara döda
+                        if (activeTable[i, j] == false && livecount >= 3) //Döda celler med 3 eller fler grannar återupplivas
+                        {
+                            inactiveTable[i, j] = true;
+                        }
+                        else if (activeTable[i, j] == true && (livecount == 2 || livecount == 3)) //Levande celler med 2 eller 3 grannar lever vidare
+                        {
+                            inactiveTable[i, j] = true;
+                        }
+                        else
+                        {
+                            inactiveTable[i, j] = false; //Celler med none of the above fortsätter vara döda
+                        }
                     }
                 }
             }
-            Array.Copy(newGen, table, newGen.Length);//Copierar nya arrayen till gamla när allt är klarräknad
         }
-
-
         static void Main(string[] args)
         {
             CurrentState = MenuState;
@@ -181,13 +164,22 @@ namespace Game_of_Life
                     if (KeyInfo.Key.ToString() == "Spacebar")
                     {
                         gameField.Step();
-                        gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
+                        gameField.PrintTable();
                     }
                     
                     else if (KeyInfo.Key.ToString() == "Escape")
                     {
                         CurrentState = MenuState;
                         menu.PrintMenu();
+                    }
+                    else if(KeyInfo.Key.ToString().ToLower() == "a")
+                    {
+                        while (!Console.KeyAvailable)
+                        {
+                            gameField.Step();
+                            gameField.PrintTable();
+                            Thread.Sleep(100);
+                        }
                     }
 
                 }
