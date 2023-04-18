@@ -117,23 +117,6 @@ namespace Game_of_Life
                     "Escape - Terminates the application");
             }
         }
-        //Den här funktionen går igenom varje möjlig position i tabellen och tilldelar den strängen "□ " som sedan skrivs ut.
-        /*TODO: för den automatiska körläget behöver vi nog ändra det så att strängen som tilldelas är randomiserad värde 
-         * och väljer mellan "□ " och "■ ". För den manuella behöver vi en funktion där användaren uppger vilka positioner
-         * som blir "■ "*/
-
-        public static void PrintTable(string[,] table)
-        {
-            for (int i = 0; i < table.GetLength(0); i++)
-            {
-                for (int j = 0; j < table.GetLength(1); j++)
-                {
-                    Console.Write(table[i, j] + " ");
-                }
-                Console.WriteLine();
-            }
-        }
-
         public static void calculateGeneration(string[,] table)
         {
             int rows = table.GetLength(0);
