@@ -89,7 +89,7 @@ namespace Game_of_Life
                         activeTable[i, j] = rand.NextDouble() > 0.5;
                 }
             }
-            public void PrintTable()
+            public void PrintTable() //FIXME varje gång spelplanen printas ut så växer den med en rad i konsollen och blir längre och längre över tid
             {
                 for (int i = 0; i < height; i++)
                 {
