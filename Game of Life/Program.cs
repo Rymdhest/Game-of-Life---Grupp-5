@@ -94,7 +94,7 @@ namespace Game_of_Life
                     for (int j = 0; j < width; j++)
                     {
                         if (activeTable[i, j]) output += "■";
-                        else output += "□";
+                        else output += " ";
                         if (i == cursor_y && j == cursor_x) output += "<";
                         else output += " ";
                     }
@@ -278,7 +278,7 @@ namespace Game_of_Life
             if (SelectedOption == 0)
             {
                 Program.CurrentState = Program.GameState;
-                gameField = new gameBoard(24, 40);
+                gameField = new gameBoard(20, 40);
             }
             if (SelectedOption == 1)
             {
