@@ -15,8 +15,22 @@ namespace Game_of_Life
         public const int GameState = 1;
         public const int QuitState = 2;
         public static gameBoard gameField;
+        public static Coordinate cursor = new();
         public static int cursor_x = 0, cursor_y = 0;
+        public static int DEFAULT_WIDTH = 40, DEFAULT_HEIGHT = 24;
 
+        public class Coordinate
+        {
+            public int x = 0, y = 0;
+            public void Set(int x, int y)
+            {
+                this.x = x; this.y = y;
+            }
+            public void Reset()
+            {
+                x = 0; y = 0;
+            }
+        }
         public static gameBoard LoadGameFromFile(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
@@ -43,7 +57,6 @@ namespace Game_of_Life
             }
             return loadedGame;
         }
-
         public class gameBoard
         {
             public void SetActiveTableValue(int i, int j, bool value)
@@ -70,6 +83,10 @@ namespace Game_of_Life
                 inactiveTable = new bool[height, width];
                 if (randomize) this.Randomize(height, width);
             }
+            public void ClearActiveTable()
+            {
+                activeTable = new bool[height, width];
+            }
             public void Step()
             {
                 calculateGeneration();
@@ -95,7 +112,7 @@ namespace Game_of_Life
                     {
                         if (activeTable[i, j]) output += "■";
                         else output += "□";
-                        if (i == cursor_y && j == cursor_x) output += "<";
+                        if (i == cursor.y && j == cursor.x) output += "<";
                         else output += " ";
                     }
 
@@ -109,8 +126,10 @@ namespace Game_of_Life
                     "a        - Runs the simulation until cancelled with spacebar\n" +
                     "← → ↑ ↓  - Move marker\n" +
                     "s        - Toggle dead/alive for selected square\n" +
+                    "c        - Clear the gameboard\n" +
                     "escape   - Return to menu\n";
                 Console.WriteLine(output);
+                Console.WindowTop = 0;
             }
             public void calculateGeneration()
             {
@@ -177,29 +196,33 @@ namespace Game_of_Life
                         CurrentState = MenuState;
                         menu.PrintMenu();
                     }
-                    else if (KeyInfo.Key.ToString() == "RightArrow" && cursor_x < gameField.width - 1)
+                    else if (KeyInfo.Key.ToString() == "RightArrow" && cursor.x < gameField.width - 1)
                     {
-                        cursor_x++;
+                        cursor.x++;
                         gameField.PrintTable();
                     }
-                    else if (KeyInfo.Key.ToString() == "LeftArrow" && cursor_x > 0)
+                    else if (KeyInfo.Key.ToString() == "LeftArrow" && cursor.x > 0)
                     {
-                        cursor_x--;
+                        cursor.x--;
                         gameField.PrintTable();
                     }
-                    else if (KeyInfo.Key.ToString() == "DownArrow" && cursor_y < gameField.height - 1)
+                    else if (KeyInfo.Key.ToString() == "DownArrow" && cursor.y < gameField.height - 1)
                     {
-                        cursor_y++;
+                        cursor.y++;
                         gameField.PrintTable();
                     }
-                    else if (KeyInfo.Key.ToString() == "UpArrow" && cursor_y > 0)
+                    else if (KeyInfo.Key.ToString() == "UpArrow" && cursor.y > 0)
                     {
-                        cursor_y--;
+                        cursor.y--;
                         gameField.PrintTable();
                     }
                     else if (KeyInfo.Key.ToString().ToLower() == "s")
                     {
-                        gameField.SetActiveTableValue(cursor_y, cursor_x, !gameField.GetActiveTableValue(cursor_y, cursor_x));
+                        gameField.SetActiveTableValue(cursor.y, cursor.x, !gameField.GetActiveTableValue(cursor.y, cursor.x));
+                    }
+                    else if (KeyInfo.Key.ToString().ToLower() == "c")
+                    {
+                        gameField.ClearActiveTable();
                     }
                     else if(KeyInfo.Key.ToString().ToLower() == "a")
                     {
@@ -277,12 +300,17 @@ namespace Game_of_Life
         {
             if (SelectedOption == 0)
             {
+                cursor.Reset();
+                gameField = new gameBoard(DEFAULT_HEIGHT, DEFAULT_WIDTH);
+                Console.SetWindowSize(DEFAULT_WIDTH + 50, DEFAULT_HEIGHT + 10);
+                Console.WindowLeft = 0;
+                Console.WindowTop = 0;
                 Program.CurrentState = Program.GameState;
-                gameField = new gameBoard(24, 40);
             }
             if (SelectedOption == 1)
             {
                 // ladda nytt spel från fil
+                cursor.Reset();
                 string filePath = Path.GetFullPath("..\\..\\..\\gameoflife2.txt");
                 Program.gameField = Program.LoadGameFromFile(filePath);
                 Program.CurrentState = Program.GameState;
