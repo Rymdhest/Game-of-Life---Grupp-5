@@ -39,7 +39,7 @@ namespace Game_of_Life
             {
                 for (int j = 0; j < width; j++)
                 {
-                    if (lines[i][j] == '■') //FIXME i filen är det 0 eller 1. så jämför mot en '1' för att se om cellen lever
+                    if (lines[i][j] == '1') //FIXME i filen är det 0 eller 1. så jämför mot en '1' för att se om cellen lever
                     {
                         loadedGame.SetActiveTableValue(i, j, true);
                     }
@@ -79,6 +79,7 @@ namespace Game_of_Life
             }
             public void Step()
             {
+                Debug.WriteLine(width + " - " + height);
                 for (int i = 0; i < height; i++)
                     for (int j = 0; j < width; j++)
                         inactiveTable[i, j] = SquareStep(i, j);
@@ -132,29 +133,7 @@ namespace Game_of_Life
                 Console.WriteLine();
             }
         }
-        public static string[,] randomizeTable()
-        {
-            string[,] table = new string[25, 40];
-            Random random = new Random();
 
-            for (int i = 0; i < table.GetLength(0); i++)
-            {
-                for (int j = 0; j < table.GetLength(1); j++)
-                {
-                    int randomNum = random.Next(2); // Skapar random siffra mellan 0 och 1
-                    if (randomNum == 0)
-                    {
-                        table[i, j] = "□";
-                    }
-                    else
-                    {
-                        table[i, j] = "■";
-                    }
-                }
-            }
-
-            return table;
-        }
         public static void calculateGeneration(string[,] table)
         {
             int rows = table.GetLength(0);
