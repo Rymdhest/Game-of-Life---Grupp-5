@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
+using System.Diagnostics;
 
 namespace Game_of_Life
 {
@@ -28,8 +29,9 @@ namespace Game_of_Life
         public static gameBoard LoadGameFromFile(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
-            int height = lines.Length;
-            int width = lines[0].Length;
+            int height = lines.Length; //FIXME blir nog en rad för mycket pga översta raden "50 50" i filen.
+            int width = lines[0].Length; //FIXME detta blir bredden på den översta raden i filen som är "50 50". alltså bara 5 tecken.
+            //enklast är nog att ta bort översta "50 50" i filen. storleken läses ändå av här i koden.
 
             gameBoard loadedGame = new gameBoard(height, width);
 
@@ -37,7 +39,7 @@ namespace Game_of_Life
             {
                 for (int j = 0; j < width; j++)
                 {
-                    if (lines[i][j] == '■')
+                    if (lines[i][j] == '■') //FIXME i filen är det 0 eller 1. så jämför mot en '1' för att se om cellen lever
                     {
                         loadedGame.SetActiveTableValue(i, j, true);
                     }
@@ -48,7 +50,6 @@ namespace Game_of_Life
 
                 }
             }
-
             return loadedGame;
         }
 
