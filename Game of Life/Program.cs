@@ -12,14 +12,14 @@ namespace Game_of_Life
         public const int MenuState = 0;
         public const int GameState = 1;
         public const int QuitState = 2;
-        public static gameBoard gameField = new gameBoard(25, 40);
+        public static gameBoard gameField;
 
         public static gameBoard LoadGameFromFile(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
-            int height = lines.Length; //FIXME blir nog en rad för mycket pga översta raden "50 50" i filen.
-            int width = lines[0].Length; //FIXME detta blir bredden på den översta raden i filen som är "50 50". alltså bara 5 tecken.
-            //enklast är nog att ta bort översta "50 50" i filen. storleken läses ändå av här i koden.
+            int height = lines.Length;
+            int width = lines[0].Length;
+
 
             gameBoard loadedGame = new gameBoard(height, width);
 
@@ -27,7 +27,7 @@ namespace Game_of_Life
             {
                 for (int j = 0; j < width; j++)
                 {
-                    if (lines[i][j] == '1') //FIXME i filen är det 0 eller 1. så jämför mot en '1' för att se om cellen lever
+                    if (lines[i][j] == '1')
                     {
                         loadedGame.SetActiveTableValue(i, j, true);
                     }
