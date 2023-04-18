@@ -89,8 +89,9 @@ namespace Game_of_Life
                         activeTable[i, j] = rand.NextDouble() > 0.5;
                 }
             }
-            public void PrintTable() //FIXME varje gång spelplanen printas ut så växer den med en rad i konsollen och blir längre och längre över tid
+            public void PrintTable() 
             {
+                Console.Clear();
                 for (int i = 0; i < height; i++)
                 {
                     for (int j = 0; j < width; j++)
@@ -98,7 +99,12 @@ namespace Game_of_Life
                         if (activeTable[i, j]) Console.Write("■ ");
                         else Console.Write("□ ");
                     }
-                    Console.WriteLine();
+                    if (i != height-1)//WTF??? varje gång spelplanen printas ut så växer den med en rad i konsollen och blir längre och längre över tid
+                        //Denna if-sats fixar problemet men ingen aning varför......................................
+                    {
+                        Console.Write("\n");
+                    }
+                    
                 }
                 Console.WriteLine("\n\n" +
                     "Controls: \n" +
@@ -169,12 +175,11 @@ namespace Game_of_Life
                 }
                 else if (CurrentState == GameState)
                 {
-                    Console.Clear();
+
                     gameField.PrintTable();
                     ConsoleKeyInfo KeyInfo = Console.ReadKey();
                     if (KeyInfo.Key.ToString() == "Spacebar")
                     {
-                        Console.Clear();
                         gameField.Step();
                         gameField.PrintTable(); //TODO implementera spelet på riktigt. bara fulkod här
                     }
@@ -184,6 +189,7 @@ namespace Game_of_Life
                         CurrentState = MenuState;
                         menu.PrintMenu();
                     }
+
                 }
             }
         }
