@@ -12,7 +12,7 @@ namespace Game_of_Life
         public const int MenuState = 0;
         public const int GameState = 1;
         public const int QuitState = 2;
-        public static gameBoard gameField;
+        public static gameBoard gameField = new gameBoard(25, 40);
 
         public static gameBoard LoadGameFromFile(string filePath)
         {
@@ -21,7 +21,7 @@ namespace Game_of_Life
             int width = lines[0].Length;
 
 
-            gameBoard loadedGame = new gameBoard(height, width);
+            gameBoard loadedGame = new gameBoard(height, width, true);
 
             for (int i = 0; i < height; i++)
             {
@@ -38,6 +38,7 @@ namespace Game_of_Life
 
                 }
             }
+            loadedGame = new gameBoard(height, width, true);
             return loadedGame;
         }
 
@@ -159,7 +160,6 @@ namespace Game_of_Life
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Menu menu = new Menu();
             menu.PrintMenu();
-            gameBoard gameField = new gameBoard(25, 40);
             while (CurrentState != QuitState)
             {
                 if (CurrentState == MenuState)
