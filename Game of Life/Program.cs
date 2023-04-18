@@ -14,18 +14,6 @@ namespace Game_of_Life
         public const int QuitState = 2;
         public static gameBoard gameField = new gameBoard(25, 40);
 
-        /*Den här funktionen initierar en dubbel array. Dubbla arrayer är som 2D tabeller, första värden
-        * är antal rader, andra värden är antal kolumner. Position i tabell kan man komma åt genom att ange rad och kolumn
-        * i den dubble arrayen, t.ex table [1,3] blir platsen på första raden, tredje kolumnen.*/
-        /*TODO: Vi kommer förmodligen behöva två dubbelarrayer. En "gammal" och en "ny" så att den nya arrayen tar emot de nya värden utan att ändra värden
-         * på den gamla (om den ändra värden på grannceller under tiden som den loopar igenom så kommer inte spelet antagligen fungera som den ska). 
-         * När den har loopat klar igenom array borde värden i nya arrayen överföras till gamla osv.*/
-        public static string[,] initializeTable(int height, int width)
-        {
-            string[,] table = new string[height, width];
-            return table;
-
-        }
         public static gameBoard LoadGameFromFile(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
