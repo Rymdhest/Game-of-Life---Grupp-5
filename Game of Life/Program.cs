@@ -5,6 +5,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Diagnostics;
 using static Game_of_Life.Program;
 using System.Timers;
+using ANSIConsole;
 
 namespace Game_of_Life
 {
@@ -110,8 +111,8 @@ namespace Game_of_Life
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (activeTable[i, j]) output += "■";
-                        else output += " ";
+                        if (activeTable[i, j]) output += "■".Color(ConsoleColor.Yellow);
+                        else output += "□".Color(ConsoleColor.DarkGreen);
                         if (i == cursor.y && j == cursor.x) output += "<";
                         else output += " ";
                     }

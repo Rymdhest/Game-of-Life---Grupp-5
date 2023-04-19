@@ -8,4 +8,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ANSI.Console" Version="2.5.0" />
+  </ItemGroup>
+
 </Project>
