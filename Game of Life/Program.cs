@@ -17,7 +17,6 @@ namespace Game_of_Life
         public const int QuitState = 2;
         public static gameBoard gameField;
         public static Coordinate cursor = new();
-        public static int cursor_x = 0, cursor_y = 0;
         public static int DEFAULT_WIDTH = 40, DEFAULT_HEIGHT = 19;
 
         public class Coordinate
@@ -37,7 +36,6 @@ namespace Game_of_Life
             string[] lines = File.ReadAllLines(filePath);
             int height = lines.Length;
             int width = lines[0].Length;
-
 
             gameBoard loadedGame = new gameBoard(height, width, true);
 
@@ -94,6 +92,7 @@ namespace Game_of_Life
                 activeTable = inactiveTable;
                 inactiveTable = new bool[height, width];
             }
+            //Används inte i nuläget:
             public void Randomize(int height, int width)
             {
                 Random rand = new Random();
@@ -113,11 +112,9 @@ namespace Game_of_Life
                     {
                         if (activeTable[i, j]) output += "■".Color(ConsoleColor.Yellow);
                         else output += "□".Color(ConsoleColor.DarkGreen);
-                        if (i == cursor.y && j == cursor.x) output += "<";
+                        if (i == cursor.y && j == cursor.x) output += "<".Color(ConsoleColor.Red);
                         else output += " ";
                     }
-
-
                     output += "\n";
                 }
 
@@ -303,8 +300,6 @@ namespace Game_of_Life
             {
                 cursor.Reset();
                 gameField = new gameBoard(DEFAULT_HEIGHT, DEFAULT_WIDTH);
-                Console.SetWindowSize(DEFAULT_WIDTH + 50, DEFAULT_HEIGHT + 10);
-                Console.WindowLeft = 0;
                 Console.WindowTop = 0;
                 Program.CurrentState = Program.GameState;
             }
