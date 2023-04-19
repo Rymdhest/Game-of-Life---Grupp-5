@@ -16,9 +16,11 @@ namespace Game_of_Life
         public const int MenuState = 0;
         public const int GameState = 1;
         public const int QuitState = 2;
+        public const int LoadState = 3;
+        public const int SaveState = 4;
         public static bool hasActiveGame = false;
         public static gameBoard activeGame;
-        public static Coordinate cursor = new();
+        public static Coordinate gameCursor = new();
         public static string savePath = "..\\..\\..\\savegames\\";
         /// <summary>
         /// public class Coordinate - a simple class storing two integers 'y' and 'x' to be used as a coordinate for the gameBoard.
@@ -113,7 +115,7 @@ namespace Game_of_Life
                 }
             }
             /// <summary>
-            /// public void PrintTable() - Clears console and then prints activeTable to console as a matrix of chars. Also prints current cursor position and keymaps. Used in game mode.
+            /// public void PrintTable() - Clears console and then prints activeTable to console as a matrix of chars. Also prints current gameCursor position and keymaps. Used in game mode.
             /// </summary>
             public void PrintTable()
             {
@@ -125,7 +127,7 @@ namespace Game_of_Life
                     {
                         if (activeTable[i, j]) output += "■".Color(ConsoleColor.Yellow);
                         else output += "□".Color(ConsoleColor.DarkGreen);
-                        if (i == cursor.y && j == cursor.x) output += "<".Color(ConsoleColor.Red);
+                        if (i == gameCursor.y && j == gameCursor.x) output += "<".Color(ConsoleColor.Red);
                         else output += " ";
                     }
                     output += "\n";
@@ -173,16 +175,14 @@ namespace Game_of_Life
                 }
                 return livecount;
             }
-            public void SaveGameToFile(string path, string file)
+            public void SaveGameToFile(string filePath)
             {
-                string filePath = Path.Combine(path, file);
                 using(StreamWriter writer = new StreamWriter(filePath))
                 {
                     string output = "";
                     for(int y = 0; y < height; y++)
                     {
                         if (y > 0) output += "\n";
-                        else Console.WriteLine("Loop start");
                         for(int x = 0; x < width; x++)
                         {
                             if (activeTable[y, x]) output += "1";
@@ -195,15 +195,16 @@ namespace Game_of_Life
         }
         public class Menu
         {
-            private string[] Options;
+            private string[] Options, Files, Menus;
             private int SelectedOption;
             private readonly string selectedPrefixMarker = "-> ";
 
             public Menu()
             {
                 SelectedOption = 0;
-                
-                Options = new string[] { "New Game", "Load Game", "Quit" };
+                Files = Directory.GetFiles(savePath);
+                Menus = new string[] { "New Game", "Load Game", "Quit" };
+                Options = Menus;
             }
             public void PrintMenu()
             {
@@ -252,34 +253,95 @@ namespace Game_of_Life
                 if (KeyInfo.Key.ToString() == "Enter") ApplySelectedOption();
 
             }
+            /// <summary>
+            /// public void UpdateMenuOptions() - Adds "Resume Game" and "Save Game" to menu options. Is called after the first game is started/loaded.
+            /// </summary>
+            public void UpdateMenuOptions()
+            {
+                if (Menus.Length == 3)
+                    {
+                        Menus = new string[] { "Resume Game", "New Game", "Save Game", "Load Game", "Quit" };
+                        Options = Menus;
+                    }
+            }
+            public void ResetMenuCursor() //resets menu cursor to 0 to having it out of scope if the menu options decrease.
+            {
+                SelectedOption = 0;
+            }
+            /// <summary>
+            /// public void SaveLoadFeedbackMessage() - Prints a feedback message to console and pauses execution for half a second.
+            /// </summary>
+            public void SaveLoadFeedbackMessage()
+            {
+                string message;
+                if (Options.Length == Files.Length + 1) //if loading...
+                    message = "Loading game...";
+                else message = "Game saved!";
+                Console.WriteLine("\n" + message.Color(ConsoleColor.Green));
+                Thread.Sleep(500);
+            }
             public void ApplySelectedOption()
             {
-                if (Options[SelectedOption] == "New Game")
+                if (Options[SelectedOption] == "New Game") //Starts a new, empty 22x40 board.
                 {
-                    if (Options.Length == 3) Options = new string[] { "Resume Game", "New Game", "Save Game", "Load Game", "Quit" };
-                    cursor.Reset();
+                    gameCursor.Reset();
                     activeGame = new gameBoard(22, 40);
-                    Console.WindowTop = 0;
+                    UpdateMenuOptions();
                     Program.CurrentState = Program.GameState;
                 }
-                if (Options[SelectedOption] == "Load Game")
+                else if (Options[SelectedOption] == "Load Game") //Launches the file menu and loads selected file
                 {
-                    if (Options.Length == 3) Options = new string[] { "Resume Game", "New Game", "Save Game", "Load Game", "Quit" };
-                    // NYI: Välj fil att ladda från.
-                    cursor.Reset();
-                    string filePath = Path.GetFullPath("..\\..\\..\\savegames\\gameoflife2.txt");
-                    Program.activeGame = Program.LoadGameFromFile(filePath);
+                    ResetMenuCursor();
+                    Files = Directory.GetFiles(savePath, "*.sav");
+                    Options = new string[Files.Length + 1];
+                    Files.CopyTo(Options, 0);
+                    Options[Options.Length - 1] = " - Return to menu";
+                }
+                else if (Options[SelectedOption] == "Save Game") //Launches the file menu and saves to selected file
+                {
+                    ResetMenuCursor();
+                    Files = Directory.GetFiles(savePath, "*.sav");
+                    Options = new string[Files.Length + 2];
+                    Files.CopyTo(Options, 0);
+                    Options[Options.Length - 2] = " - New file";
+                    Options[Options.Length - 1] = " - Return to menu";
+                }
+                else if (Options[SelectedOption] == " - Return to menu") //Aborts load/save operations
+                {
+                    Options = Menus;
+                    ResetMenuCursor();
+                }
+                else if (Options[SelectedOption] == " - New file") //Prompts the user to type in name and saves to that filename
+                {
+                    Console.Write("\nEnter filename (finish with 'enter') >".Color(ConsoleColor.DarkGreen));
+                    activeGame.SaveGameToFile(Path.Combine(savePath, Console.ReadLine()));
+                    SaveLoadFeedbackMessage();
+                    Options = Menus;
+                    ResetMenuCursor();
+                }
+                else if (Files.Contains(Options[SelectedOption])) //loading/saving
+                {
+                    if(Options.Length == Files.Length + 1) //if loading...
+                    {
+                        SaveLoadFeedbackMessage();
+                        activeGame = LoadGameFromFile(Options[SelectedOption]);
+                        CurrentState = GameState;
+                        UpdateMenuOptions();
+                        gameCursor.Reset();
+                    }
+                    else //if saving...
+                    {
+                        SaveLoadFeedbackMessage();
+                        activeGame.SaveGameToFile(Options[SelectedOption]);
+                    }
+                    ResetMenuCursor();
+                    Options = Menus;
+                }
+                else if (Options[SelectedOption] == "Resume Game") //Återgår till spelet
+                {
                     Program.CurrentState = Program.GameState;
                 }
-                if (Options[SelectedOption] == "Save Game")
-                {
-                    activeGame.SaveGameToFile(savePath, "test.file");
-                }
-                if (Options[SelectedOption] == "Resume Game") //Återgår till spelet
-                {
-                    Program.CurrentState = Program.GameState;
-                }
-                if (Options[SelectedOption] == "Quit")
+                else if (Options[SelectedOption] == "Quit")
                 {
                     Program.CurrentState = Program.QuitState;
                 }
@@ -299,6 +361,14 @@ namespace Game_of_Life
                     menu.checkInput();
                     menu.PrintMenu();
                 }
+                else if(CurrentState == LoadState)
+                {
+
+                }
+                else if(CurrentState == SaveState)
+                {
+
+                }
                 else if (CurrentState == GameState)
                 {
                     //Updates the console by clearing it and printing activeTable and keymap:
@@ -313,17 +383,17 @@ namespace Game_of_Life
                         CurrentState = MenuState;
                         menu.PrintMenu();
                     }
-                    //Arrow keys edits the position of the cursor
-                    else if (KeyInfo.Key.ToString() == "RightArrow" && cursor.x < activeGame.width - 1)
-                        cursor.x++;
-                    else if (KeyInfo.Key.ToString() == "LeftArrow" && cursor.x > 0)
-                        cursor.x--;
-                    else if (KeyInfo.Key.ToString() == "DownArrow" && cursor.y < activeGame.height - 1)
-                        cursor.y++;
-                    else if (KeyInfo.Key.ToString() == "UpArrow" && cursor.y > 0)
-                        cursor.y--;
+                    //Arrow keys edits the position of the gameCursor
+                    else if (KeyInfo.Key.ToString() == "RightArrow" && gameCursor.x < activeGame.width - 1)
+                        gameCursor.x++;
+                    else if (KeyInfo.Key.ToString() == "LeftArrow" && gameCursor.x > 0)
+                        gameCursor.x--;
+                    else if (KeyInfo.Key.ToString() == "DownArrow" && gameCursor.y < activeGame.height - 1)
+                        gameCursor.y++;
+                    else if (KeyInfo.Key.ToString() == "UpArrow" && gameCursor.y > 0)
+                        gameCursor.y--;
                     else if (KeyInfo.Key.ToString().ToLower() == "s") //s key sets status of selected cell between alive and dead
-                        activeGame.SetActiveTableValue(cursor.y, cursor.x, !activeGame.GetActiveTableValue(cursor.y, cursor.x));
+                        activeGame.SetActiveTableValue(gameCursor.y, gameCursor.x, !activeGame.GetActiveTableValue(gameCursor.y, gameCursor.x));
                     else if (KeyInfo.Key.ToString().ToLower() == "c")
                         activeGame.ClearActiveTable();
                     else if (KeyInfo.Key.ToString().ToLower() == "r")
