@@ -312,7 +312,7 @@ namespace Game_of_Life
             {
                 // ladda nytt spel från fil
                 cursor.Reset();
-                string filePath = Path.GetFullPath("..\\..\\..\\gameoflife2.txt");
+                string filePath = Path.GetFullPath("..\\..\\..\\gameoflife.txt");
                 Program.gameField = Program.LoadGameFromFile(filePath);
                 Program.CurrentState = Program.GameState;
             }
