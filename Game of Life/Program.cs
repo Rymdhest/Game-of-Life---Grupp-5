@@ -123,25 +123,32 @@ namespace Game_of_Life
             }
             public void calculateGeneration()
             {
-                for (int i = 0; i < height; i++)
-                    for (int j = 0; j < width; j++)
+                for (int x = 0; x < height; x++)
+                    for (int y = 0; y < width; y++)
                     {
-                        int livecount = 0;
-                        for (int x = i - 1; x <= i + 1; x++)
-                            for (int y = j - 1; y <= j + 1; y++)
-                            {
-                                if (x < 0 || y < 0 || x >= height || y >= width || (x == i && y == j)) //denna rad skippar räkna med cellen man står på och cellerna utanför rutnätet
-                                    continue;
-                                if (activeTable[x, y] == true)
-                                    livecount++;
-                            }
-                        if (activeTable[i, j] == false && livecount == 3) //Döda celler med 3 grannar återupplivas
-                            inactiveTable[i, j] = true;
-                        else if (activeTable[i, j] == true && (livecount == 2 || livecount == 3)) //Levande celler med 2 eller 3 grannar lever vidare
-                            inactiveTable[i, j] = true;
+                        int aliveNeighbours = GetNumberOfAliveNeighbours(x, y);
+                        if (activeTable[x, y] == false && aliveNeighbours == 3) //Döda celler med 3 grannar återupplivas
+                            inactiveTable[x, y] = true;
+                        else if (activeTable[x, y] == true && (aliveNeighbours == 2 || aliveNeighbours == 3)) //Levande celler med 2 eller 3 grannar lever vidare
+                            inactiveTable[x, y] = true;
                         else
-                            inactiveTable[i, j] = false; //Celler med none of the above fortsätter vara döda
+                            inactiveTable[x, y] = false; //Celler med none of the above fortsätter vara döda
                     }
+            }
+            private int GetNumberOfAliveNeighbours(int x, int y)
+            {
+                int livecount = 0;
+                for (int xOffset = x - 1; xOffset <= x + 1; xOffset++)
+                {
+                    for (int yOffset = y - 1; yOffset <= y + 1; yOffset++)
+                    {
+                        if (xOffset < 0 || yOffset < 0 || xOffset >= height || yOffset >= width || (xOffset == x && y == yOffset)) //denna rad skippar räkna med cellen man står på och cellerna utanför rutnätet
+                            continue;
+                        if (activeTable[xOffset, yOffset] == true)
+                            livecount++;
+                    }
+                }
+                return livecount;
             }
         }
         public class Menu
