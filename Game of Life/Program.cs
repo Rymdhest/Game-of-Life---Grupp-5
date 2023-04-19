@@ -6,6 +6,7 @@ using System.Diagnostics;
 using static Game_of_Life.Program;
 using System.Timers;
 using ANSIConsole;
+using System.Runtime.CompilerServices;
 
 namespace Game_of_Life
 {
@@ -16,10 +17,11 @@ namespace Game_of_Life
         public const int GameState = 1;
         public const int QuitState = 2;
         public static bool hasActiveGame = false;
-        public static gameBoard activeBoard;
+        public static gameBoard activeGame;
         public static Coordinate cursor = new();
+        public static string savePath = "..\\..\\..\\savegames\\";
         /// <summary>
-        /// public class Coordinate - a simple class storing two integers 'x' and 'y' to be used as a coordinate for the gameBoard.
+        /// public class Coordinate - a simple class storing two integers 'y' and 'x' to be used as a coordinate for the gameBoard.
         /// </summary>
         public class Coordinate
         {
@@ -143,16 +145,16 @@ namespace Game_of_Life
             /// </summary>
             public void calculateGeneration()
             {
-                for (int x = 0; x < height; x++)
-                    for (int y = 0; y < width; y++)
+                for (int y = 0; y < height; y++)
+                    for (int x = 0; x < width; x++)
                     {
-                        int aliveNeighbours = GetNumberOfAliveNeighbours(x, y);
-                        if (activeTable[x, y] == false && aliveNeighbours == 3) //Döda celler med 3 grannar återupplivas
-                            inactiveTable[x, y] = true;
-                        else if (activeTable[x, y] == true && (aliveNeighbours == 2 || aliveNeighbours == 3)) //Levande celler med 2 eller 3 grannar lever vidare
-                            inactiveTable[x, y] = true;
+                        int aliveNeighbours = GetNumberOfAliveNeighbours(y, x);
+                        if (activeTable[y, x] == false && aliveNeighbours == 3) //Döda celler med 3 grannar återupplivas
+                            inactiveTable[y, x] = true;
+                        else if (activeTable[y, x] == true && (aliveNeighbours == 2 || aliveNeighbours == 3)) //Levande celler med 2 eller 3 grannar lever vidare
+                            inactiveTable[y, x] = true;
                         else
-                            inactiveTable[x, y] = false; //Celler med none of the above fortsätter vara döda
+                            inactiveTable[y, x] = false; //Celler med none of the above fortsätter vara döda
                     }
             }
 
@@ -170,6 +172,25 @@ namespace Game_of_Life
                     }
                 }
                 return livecount;
+            }
+            public void SaveGameToFile(string path, string file)
+            {
+                string filePath = Path.Combine(path, file);
+                using(StreamWriter writer = new StreamWriter(filePath))
+                {
+                    string output = "";
+                    for(int y = 0; y < height; y++)
+                    {
+                        if (y > 0) output += "\n";
+                        else Console.WriteLine("Loop start");
+                        for(int x = 0; x < width; x++)
+                        {
+                            if (activeTable[y, x]) output += "1";
+                            else output += "0";
+                        }
+                    }
+                    writer.Write(output);
+                }
             }
         }
         public class Menu
@@ -237,7 +258,7 @@ namespace Game_of_Life
                 {
                     if (Options.Length == 3) Options = new string[] { "Resume Game", "New Game", "Save Game", "Load Game", "Quit" };
                     cursor.Reset();
-                    activeBoard = new gameBoard(22, 40);
+                    activeGame = new gameBoard(22, 40);
                     Console.WindowTop = 0;
                     Program.CurrentState = Program.GameState;
                 }
@@ -246,13 +267,13 @@ namespace Game_of_Life
                     if (Options.Length == 3) Options = new string[] { "Resume Game", "New Game", "Save Game", "Load Game", "Quit" };
                     // NYI: Välj fil att ladda från.
                     cursor.Reset();
-                    string filePath = Path.GetFullPath("..\\..\\..\\gameoflife2.txt");
-                    Program.activeBoard = Program.LoadGameFromFile(filePath);
+                    string filePath = Path.GetFullPath("..\\..\\..\\savegames\\gameoflife2.txt");
+                    Program.activeGame = Program.LoadGameFromFile(filePath);
                     Program.CurrentState = Program.GameState;
                 }
                 if (Options[SelectedOption] == "Save Game")
                 {
-                    // NYI: Spara spel till fil.
+                    activeGame.SaveGameToFile(savePath, "test.file");
                 }
                 if (Options[SelectedOption] == "Resume Game") //Återgår till spelet
                 {
@@ -281,11 +302,11 @@ namespace Game_of_Life
                 else if (CurrentState == GameState)
                 {
                     //Updates the console by clearing it and printing activeTable and keymap:
-                    activeBoard.PrintTable();
+                    activeGame.PrintTable();
                     //REPL for game mode:
                     ConsoleKeyInfo KeyInfo = Console.ReadKey();
                     if (KeyInfo.Key.ToString() == "Spacebar") //Steps the simulation one tick forward in time.
-                        activeBoard.Step();
+                        activeGame.Step();
                     else if (KeyInfo.Key.ToString() == "Escape") //Returns to menu mode
                         //FIXME: När man kör load game och sen escape så ser menyn lite konstigt ut
                     {
@@ -293,25 +314,25 @@ namespace Game_of_Life
                         menu.PrintMenu();
                     }
                     //Arrow keys edits the position of the cursor
-                    else if (KeyInfo.Key.ToString() == "RightArrow" && cursor.x < activeBoard.width - 1)
+                    else if (KeyInfo.Key.ToString() == "RightArrow" && cursor.x < activeGame.width - 1)
                         cursor.x++;
                     else if (KeyInfo.Key.ToString() == "LeftArrow" && cursor.x > 0)
                         cursor.x--;
-                    else if (KeyInfo.Key.ToString() == "DownArrow" && cursor.y < activeBoard.height - 1)
+                    else if (KeyInfo.Key.ToString() == "DownArrow" && cursor.y < activeGame.height - 1)
                         cursor.y++;
                     else if (KeyInfo.Key.ToString() == "UpArrow" && cursor.y > 0)
                         cursor.y--;
                     else if (KeyInfo.Key.ToString().ToLower() == "s") //s key sets status of selected cell between alive and dead
-                        activeBoard.SetActiveTableValue(cursor.y, cursor.x, !activeBoard.GetActiveTableValue(cursor.y, cursor.x));
+                        activeGame.SetActiveTableValue(cursor.y, cursor.x, !activeGame.GetActiveTableValue(cursor.y, cursor.x));
                     else if (KeyInfo.Key.ToString().ToLower() == "c")
-                        activeBoard.ClearActiveTable();
+                        activeGame.ClearActiveTable();
                     else if (KeyInfo.Key.ToString().ToLower() == "r")
-                        activeBoard.Randomize();
+                        activeGame.Randomize();
                     else if (KeyInfo.Key.ToString().ToLower() == "a") //a sets simulation to automode. Makes the console run one tick each 100 ms until another key is pressed.
                         while (!Console.KeyAvailable)
                         {
-                            activeBoard.Step();
-                            activeBoard.PrintTable();
+                            activeGame.Step();
+                            activeGame.PrintTable();
                             Thread.Sleep(100);
                         }
                 }
