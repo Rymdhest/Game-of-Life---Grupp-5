@@ -153,7 +153,7 @@ namespace Game_of_Life
                                 }
                             }
                         }
-                        if (activeTable[i, j] == false && livecount >= 3) //Döda celler med 3 eller fler grannar återupplivas
+                        if (activeTable[i, j] == false && livecount == 3) //Döda celler med 3 eller fler grannar återupplivas
                         {
                             inactiveTable[i, j] = true;
                         }
@@ -192,7 +192,7 @@ namespace Game_of_Life
                         gameField.Step();
                         gameField.PrintTable();
                     }
-                    else if (KeyInfo.Key.ToString() == "Escape")
+                    else if (KeyInfo.Key.ToString() == "Escape")//FIXME: När man kör load game och sen escape så ser menyn lite konstigt ut
                     {
                         CurrentState = MenuState;
                         menu.PrintMenu();
