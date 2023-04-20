@@ -288,7 +288,6 @@ namespace Game_of_Life
                 if (KeyInfo.Key.ToString() == "UpArrow") DecrementSelectedOption();
                 if (KeyInfo.Key.ToString() == "DownArrow") IncrementSelectedOption();
                 if (KeyInfo.Key.ToString() == "Enter") ApplySelectedOption();
-
             }
             /// <summary>
             /// public void UpdateMenuOptions() - Adds "Resume Game" and "Save Game" to menu options. Is called after the first game is started/loaded.
@@ -402,6 +401,7 @@ namespace Game_of_Life
                 {
                     menu.checkInput();
                     menu.PrintMenu();
+                    menu.PrintMenu();//HACK Riktigt fulkod men det fixar en bugg med escape...
                 }
                 else if(CurrentState == LoadState)
                 {
@@ -425,6 +425,7 @@ namespace Game_of_Life
                     {
                         CurrentState = MenuState;
                         menu.PrintMenu();
+                        menu.PrintMenu(); //HACK Riktigt fulkod men det fixar en bugg med escape....
                     }
                     //Arrow keys edits the position of the gameCursor
                     else if (KeyInfo.Key.ToString() == "RightArrow" && gameCursor.x < activeGame.width - 1)
