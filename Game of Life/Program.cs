@@ -37,6 +37,10 @@ namespace Game_of_Life
                 x = 0; y = 0;
             }
         }
+        /// <summary>
+        /// public static gameBoard LoadGameFromFile(string filePath) - returns a new gameBoard created from a file from a given filepath. 
+        /// The file should be a grid of 1s and 0s. 1 = alive cell. 0 = dead cell.
+        /// </summary>
         public static gameBoard LoadGameFromFile(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
@@ -160,8 +164,10 @@ namespace Game_of_Life
                             inactiveTable[y, x] = false; //Celler med none of the above fortsätter vara döda
                     }
             }
-
-            private int GetNumberOfAliveNeighbours(int x, int y)//Calculates sunm of neighboring live cells
+            /// <summary>
+            /// private int GetNumberOfAliveNeighbours(int x, int y) - Returns the number of alive neighbours in a 3x3 grid centered around x and y. 
+            /// </summary>
+            private int GetNumberOfAliveNeighbours(int x, int y)
             {
                 int livecount = 0;
                 for (int xOffset = x - 1; xOffset <= x + 1; xOffset++)
@@ -194,12 +200,19 @@ namespace Game_of_Life
                 }
             }
         }
+
+        /// <summary>
+        /// public class Menu - Holds information about all menus in the game.
+        /// </summary>
         public class Menu
         {
             private string[] Options, Files, Menus;
             private int SelectedOption;
             private readonly string selectedPrefixMarker = "-> ";
 
+            /// <summary>
+            /// public Menu() - Initializes the menus
+            /// </summary>
             public Menu()
             {
                 SelectedOption = 0;
@@ -207,6 +220,9 @@ namespace Game_of_Life
                 Menus = new string[] { "New Game", "Load Game", "Quit" };
                 Options = Menus;
             }
+            /// <summary>
+            /// public void PrintMenu() - Clear the console and then prints out the current menu.
+            /// </summary>
             public void PrintMenu()
             {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -232,6 +248,9 @@ namespace Game_of_Life
                 }
                 Console.ResetColor();
             }
+            /// <summary>
+            /// private void IncrementSelectedOption() - increments the selected option in the menu by 1 not already at last.
+            /// </summary>
             private void IncrementSelectedOption()
             {
                 if (SelectedOption < Options.Length - 1)
@@ -239,6 +258,9 @@ namespace Game_of_Life
                     SelectedOption++;
                 }
             }
+            /// <summary>
+            /// private void DecrementSelectedOption() - decrements the selected option in the menu by 1 if not already at first.
+            /// </summary>
             private void DecrementSelectedOption()
             {
                 if (SelectedOption > 0)
@@ -246,6 +268,10 @@ namespace Game_of_Life
                     SelectedOption--;
                 }
             }
+            /// <summary>
+            /// public void checkInput() - Waits for the console to give the next pressed key and then takes action on that if a valid key is pressed.
+            /// Valid keys are up arrow, down arrow and enter.
+            /// </summary>
             public void checkInput()
             {
                 ConsoleKeyInfo KeyInfo = Console.ReadKey();
@@ -281,7 +307,10 @@ namespace Game_of_Life
                 Console.WriteLine("\n" + message.Color(ConsoleColor.Green));
                 Thread.Sleep(500);
             }
-            public void ApplySelectedOption()
+            /// <summary>
+            /// private void ApplySelectedOption() - performs the selected menu option. This method is used by the checkInput() method.
+            /// </summary>
+            private void ApplySelectedOption()
             {
                 if (Options[SelectedOption] == "New Game") //Starts a new, empty 22x40 board.
                 {
@@ -348,13 +377,15 @@ namespace Game_of_Life
                 }
             }
         }
-
+        
         static void Main(string[] args)
         {
             CurrentState = MenuState;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Menu menu = new Menu();
             menu.PrintMenu();
+
+            // The main game loop. Decides what to do based on the current state of the game.
             while (CurrentState != QuitState)
             {
                 if (CurrentState == MenuState)
