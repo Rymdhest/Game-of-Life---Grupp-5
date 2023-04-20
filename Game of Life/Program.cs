@@ -16,8 +16,6 @@ namespace Game_of_Life
         public const int MenuState = 0;
         public const int GameState = 1;
         public const int QuitState = 2;
-        public const int LoadState = 3;
-        public const int SaveState = 4;
         public static bool hasActiveGame = false;
         public static gameBoard activeGame;
         public static Coordinate gameCursor = new();
@@ -192,6 +190,10 @@ namespace Game_of_Life
                 }
                 return livecount;
             }
+            /// <summary>
+            /// public void SaveGameToFile(string filePath) - Saves current state of gameboard to 'filePath'
+            /// </summary>
+            /// <param name="filePath"></param>
             public void SaveGameToFile(string filePath)
             {
                 using(StreamWriter writer = new StreamWriter(filePath))
@@ -300,7 +302,10 @@ namespace Game_of_Life
                         Options = Menus;
                     }
             }
-            public void ResetMenuCursor() //resets menu cursor to 0 to having it out of scope if the menu options decrease.
+            /// <summary>
+            /// public void ResetMenuCursor() - resets menu cursor to 0 to avoid having it out of scope if the size of the menu changes.
+            /// </summary>
+            public void ResetMenuCursor()
             {
                 SelectedOption = 0;
             }
@@ -358,9 +363,9 @@ namespace Game_of_Life
                     Options = Menus;
                     ResetMenuCursor();
                 }
-                else if (Files.Contains(Options[SelectedOption])) //loading/saving
+                else if (Files.Contains(Options[SelectedOption])) //The user chooses an existing file to save or load to
                 {
-                    if(Options.Length == Files.Length + 1) //if loading...
+                    if(Options.Length == Files.Length + 1) //if loading... jumps to game mode
                     {
                         SaveLoadFeedbackMessage();
                         activeGame = LoadGameFromFile(Options[SelectedOption]);
@@ -368,7 +373,7 @@ namespace Game_of_Life
                         UpdateMenuOptions();
                         gameCursor.Reset();
                     }
-                    else //if saving...
+                    else //if saving... returns to main menu
                     {
                         SaveLoadFeedbackMessage();
                         activeGame.SaveGameToFile(Options[SelectedOption]);
@@ -380,7 +385,7 @@ namespace Game_of_Life
                 {
                     Program.CurrentState = Program.GameState;
                 }
-                else if (Options[SelectedOption] == "Quit")
+                else if (Options[SelectedOption] == "Quit") //Avslutar
                 {
                     Program.CurrentState = Program.QuitState;
                 }
@@ -402,14 +407,6 @@ namespace Game_of_Life
                     menu.checkInput();
                     menu.PrintMenu();
                     menu.PrintMenu();//HACK Riktigt fulkod men det fixar en bugg med escape...
-                }
-                else if(CurrentState == LoadState)
-                {
-
-                }
-                else if(CurrentState == SaveState)
-                {
-
                 }
                 else if (CurrentState == GameState)
                 {
