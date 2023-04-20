@@ -66,29 +66,34 @@ namespace Game_of_Life
         /// </summary>
         public class gameBoard
         {
-            public void SetActiveTableValue(int i, int j, bool value)
-            {
-                activeTable[i, j] = value;
-            }
-
-            public bool GetActiveTableValue(int i, int j)
-            {
-                return activeTable[i, j];
-            }
-
             public int height { get; private set; }
             public int width { get; private set; }
             private bool[,] activeTable;
             private bool[,] inactiveTable;
+            private const int MAX_PRINT_WIDTH = 60;
+            private const int MAX_PRINT_HEIGHT = 22;
 
             public gameBoard(int height, int width, bool randomize = false)
             {
-                //FIXME storleken på spelplanen får inte vara större än konsollrutan. då fungerar inte Console.clear() som vi vill.
                 this.height = height;
                 this.width = width;
                 activeTable = new bool[height, width];
                 inactiveTable = new bool[height, width];
                 if (randomize) this.Randomize();
+            }
+            /// <summary>
+            /// public void SetActiveTableValue() - sets a given cell (x,y) to be alive or not from the input value.
+            /// </summary>
+            public void SetActiveTableValue(int x, int y, bool value)
+            {
+                activeTable[x, y] = value;
+            }
+            /// <summary>
+            /// public bool GetActiveTableValue() - returns wether a given cell (x,y) from the active table is alive or not.
+            /// </summary>
+            public bool GetActiveTableValue(int x, int y)
+            {
+                return activeTable[x, y];
             }
             /// <summary>
             /// public void ClearActiveTable() - sets all cells in the active board to dead (false).
@@ -124,14 +129,19 @@ namespace Game_of_Life
             public void PrintTable()
             {
                 Console.Clear();
+                int printWidth = width;
+                if (printWidth > MAX_PRINT_WIDTH) printWidth = MAX_PRINT_WIDTH;
+
+                int printHeight = height;
+                if (printHeight > MAX_PRINT_HEIGHT) printHeight = MAX_PRINT_HEIGHT;
                 string output = "";
-                for (int i = 0; i < height; i++)
+                for (int y = 0; y < printHeight; y++)
                 {
-                    for (int j = 0; j < width; j++)
+                    for (int x = 0; x < printWidth; x++)
                     {
-                        if (activeTable[i, j]) output += "■".Color(ConsoleColor.Yellow);
+                        if (activeTable[y, x]) output += "■".Color(ConsoleColor.Yellow);
                         else output += "□".Color(ConsoleColor.DarkGreen);
-                        if (i == gameCursor.y && j == gameCursor.x) output += "<".Color(ConsoleColor.Red);
+                        if (y == gameCursor.y && x == gameCursor.x) output += "<".Color(ConsoleColor.Red);
                         else output += " ";
                     }
                     output += "\n";
