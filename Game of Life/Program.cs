@@ -358,7 +358,9 @@ namespace Game_of_Life
                 else if (Options[SelectedOption] == " - New file") //Prompts the user to type in name and saves to that filename
                 {
                     Console.Write("\nEnter filename (finish with 'enter') >".Color(ConsoleColor.DarkGreen));
-                    activeGame.SaveGameToFile(Path.Combine(savePath, Console.ReadLine()));
+                    string newFile = Console.ReadLine();
+                    if (newFile.Length < 4 || newFile.Substring(newFile.Length - 4) != ".sav") newFile += ".sav"; //Add fileending '.sav' if the player hasn't written it
+                    activeGame.SaveGameToFile(Path.Combine(savePath, newFile));
                     SaveLoadFeedbackMessage();
                     Options = Menus;
                     ResetMenuCursor();
