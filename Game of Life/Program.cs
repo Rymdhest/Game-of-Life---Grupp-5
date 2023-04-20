@@ -41,7 +41,7 @@ namespace Game_of_Life
         /// public static gameBoard LoadGameFromFile(string filePath) - returns a new gameBoard created from a file from a given filepath. 
         /// The file should be a grid of 1s and 0s. 1 = alive cell. 0 = dead cell.
         /// </summary>
-        public static gameBoard LoadGameFromFile(string filePath)
+        public static gameBoard LoadGameFromFile(string filePath)//FIXME: If file doesnt end with ".sav" function doesn't find it, make it so that save function adds it.
         {
             string[] lines = File.ReadAllLines(filePath);
             int height = lines.Length;
